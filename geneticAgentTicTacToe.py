@@ -1,7 +1,7 @@
 # MAIN FILE
 import gc
 from tictactoe import tictactoe
-from geneticAgentFunctions import startAgent
+from geneticAgentFunctions import startAgent, loadAgentsWeights
 from tictactoeAgents import *
 from helperFunctions import list_to_str
 
@@ -57,11 +57,14 @@ if __name__ == '__main__':
                 bestAgent = input("Which one is the benchmark Agent? ( RandomAgent, Player, " + agentString + ") \n")
             bestAgentType = eval(bestAgent)
             if bestAgentType == RandomAgent or bestAgentType == Player:
-                benchmarkAgent = bestAgentType(input("BenchmarkName: "))
+                benchmarkAgent = bestAgentType('Bench Mark')
             else:
                 try:
-                    benchmarkAgent = startAgent(population, generations, eval("weights" + agentType), agentTypeGiven=eval(agentType))
+                    weights = loadAgentsWeights(eval("weights" + bestAgent))
+                    benchmarkAgent = bestAgentType('Bench Mark')
+                    benchmarkAgent.set_weights(weights[0])
                 except Exception:
+                    benchmarkAgent == RandomAgent('Bench Mark')
                     pass
         agent = startAgent(popul=population, gener=generations, file=eval("weights" + agentType), agentTypeGiven=eval(agentType), bestAgentGiven=benchmarkAgent)
     else:
