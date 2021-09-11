@@ -98,64 +98,66 @@ def crossover():
     offspring = []
     for i in range( math.ceil( len(agentsDead)/2 ) ):
         parent1 = random.choice(agents)
+        p1Weights = parent1.get_weights()
         parent2 = random.choice(agents)
+        p2Weights = parent2.get_weights()
         conv = max(0,min(1,random.gauss(0.5, 0.2)))
         try:
             child1 = agentsDead.pop(0)
+        except Exception:
+            break
+        try:
             child1.name = "[" + parent1.name + "," + parent2.name + "]"
-            if isinstance( child1.w, list):
-                for a1 in range(len(child1.w)):
-                    if isinstance( child1.w[a1], list):
-                        for a2 in range(len(child1.w[a1])):
-                            if isinstance( child1.w[a1][a2], list):
-                                for a3 in range(len(child1.w[a1][a2])):
-                                    if isinstance( child1.w[a1][a2][a3], list):
-                                        for a4 in range(len(child1.w[a1][a2][a3])):
-                                            child1.w[a1][a2][a3][a4] = conv*parent1.w[a1][a2][a3][a4] + (1-conv)*parent2.w[a1][a2][a3][a4]
+            weights = child1.get_weights()
+            if isinstance( weights, list):
+                for a1 in range(len(weights)):
+                    if isinstance( weights[a1], list):
+                        for a2 in range(len(weights[a1])):
+                            if isinstance( weights[a1][a2], list):
+                                for a3 in range(len(weights[a1][a2])):
+                                    if isinstance( weights[a1][a2][a3], list):
+                                        for a4 in range(len(weights[a1][a2][a3])):
+                                            weights[a1][a2][a3][a4] = conv*p1Weights[a1][a2][a3][a4] + (1-conv)*p2Weights[a1][a2][a3][a4]
                                     else:
-                                        child1.w[a1][a2][a3] = conv*parent1.w[a1][a2][a3] + (1-conv)*parent2.w[a1][a2][a3]
+                                        weights[a1][a2][a3] = conv*p1Weights[a1][a2][a3] + (1-conv)*p2Weights[a1][a2][a3]
                             else:
-                                child1.w[a1][a2] = conv*parent1.w[a1][a2] + (1-conv)*parent2.w[a1][a2]
+                                weights[a1][a2] = conv*p1Weights[a1][a2] + (1-conv)*p2Weights[a1][a2]
                     else:
-                        child1.w[a1] = conv*parent1.w[a1] + (1-conv)*parent2.w[a1]
+                        weights[a1] = conv*p1Weights[a1] + (1-conv)*p2Weights[a1]
             else:
-                child1.w = conv*parent1.w + (1-conv)*parent2.w
-            if hasattr( child1, "balance_weights" ):
-                try:
-                    child1.balance_weights()
-                except Exception:
-                    print( "balance_weights is not a function or is not working properly" )
+                weights = conv*p1Weights + (1-conv)*p2Weights
+            child1.set_weights(weights)
             offspring.append(child1)
         except Exception:
-            print("Exception in crossover")
+            print("Exception in crossover Child 1")
         try:
             child2 = agentsDead.pop(1)
+        except Exception:
+            break
+        try:
             child2.name = "[" + parent2.name + "," + parent1.name + "]"
-            if isinstance( child2.w, list):
-                for a1 in range(len(child2.w)):
-                    if isinstance( child2.w[a1], list):
-                        for a2 in range(len(child2.w[a1])):
-                            if isinstance( child2.w[a1][a2], list):
-                                for a3 in range(len(child2.w[a1][a2])):
-                                    if isinstance( child2.w[a1][a2][a3], list):
-                                        for a4 in range(len(child2.w[a1][a2][a3])):
-                                            child2.w[a1][a2][a3][a4] = conv*parent2.w[a1][a2][a3][a4] + (1-conv)*parent1.w[a1][a2][a3][a4]
+            weights = child1.get_weights()
+            if isinstance( weights, list):
+                for a1 in range(len(weights)):
+                    if isinstance( weights[a1], list):
+                        for a2 in range(len(weights[a1])):
+                            if isinstance( weights[a1][a2], list):
+                                for a3 in range(len(weights[a1][a2])):
+                                    if isinstance( weights[a1][a2][a3], list):
+                                        for a4 in range(len(weights[a1][a2][a3])):
+                                            weights[a1][a2][a3][a4] = conv*p2Weights[a1][a2][a3][a4] + (1-conv)*p1Weights[a1][a2][a3][a4]
                                     else:
-                                        child2.w[a1][a2][a3] = conv*parent2.w[a1][a2][a3] + (1-conv)*parent1.w[a1][a2][a3]
+                                        weights[a1][a2][a3] = conv*p2Weights[a1][a2][a3] + (1-conv)*p1Weights[a1][a2][a3]
                             else:
-                                child2.w[a1][a2] = conv*parent2.w[a1][a2] + (1-conv)*parent1.w[a1][a2]
+                                weights[a1][a2] = conv*p2Weights[a1][a2] + (1-conv)*p1Weights[a1][a2]
                     else:
-                        child2.w[a1] = conv*parent2.w[a1] + (1-conv)*parent1.w[a1]
+                        weights[a1] = conv*p2Weights[a1] + (1-conv)*p1Weights[a1]
             else:
-                child2.w = conv*parent2.w + (1-conv)*parent1.w
-            if hasattr( child1, "balance_weights" ):
-                try:
-                    child1.balance_weights()
-                except Exception:
-                    print( "balance_weights is not a function or is not working properly" )
+                weights = conv*p2Weights + (1-conv)*p1Weights
+            child2.set_weights(weights)
             offspring.append(child2)
         except Exception:
-            print("Exception in crossover")
+            print("Exception in crossover Child 2")
     while len(agents)+len(offspring) > population:
         del offspring[-1]
     agents.extend(offspring)
@@ -167,29 +169,25 @@ def mutation():
     for _ in range(math.ceil(len(agents)*1.5)):
         targetAgent = random.choice(agents[int(0.2 * len(agents)):])
         targetValue = random.random()*2-1
-        if isinstance( targetAgent.w, list):
-            t1 = random.randint(0,len(targetAgent.w)-1)
-            if isinstance( targetAgent.w[t1], list):
-                t2 = random.randint(0,len(targetAgent.w[t1])-1)
-                if isinstance( targetAgent.w[t1][t2], list):
-                    t3 = random.randint(0,len(targetAgent.w[t1][t2])-1)
-                    if isinstance( targetAgent.w[t1][t2][t3], list):
-                        t4 = random.randint(0,len(targetAgent.w[t1][t2])-1)
-                        targetAgent.w[t1][t2][t3][t4] = targetValue
+        weights = targetAgent.get_weights()
+        if isinstance( weights, list):
+            t1 = random.randint(0,len(weights)-1)
+            if isinstance( weights[t1], list):
+                t2 = random.randint(0,len(weights[t1])-1)
+                if isinstance( weights[t1][t2], list):
+                    t3 = random.randint(0,len(weights[t1][t2])-1)
+                    if isinstance( weights[t1][t2][t3], list):
+                        t4 = random.randint(0,len(weights[t1][t2])-1)
+                        weights[t1][t2][t3][t4] = targetValue
                     else:
-                        targetAgent.w[t1][t2][t3] = targetValue
+                        weights[t1][t2][t3] = targetValue
                 else:
-                    targetAgent.w[t1][t2] = targetValue
+                    weights[t1][t2] = targetValue
             else:
-                targetAgent.w[t1] = targetValue
+                weights[t1] = targetValue
         else:
-            targetAgent.w = targetValue
-    for agent in agents:
-        if hasattr( agent, "balance_weights" ):
-            try:
-                agent.balance_weights()
-            except Exception:
-                print( "balance_weights is not a function or is not working properly" )
+            weights = targetValue
+        targetAgent.set_weights(weights)
     return
 
 # Load weights from pickle-file
@@ -202,7 +200,7 @@ def loadAgentsWeights(file):
 def saveAgentsWeights(file):
     weightlist = [0] * len(agents)
     for i in range(len(agents)):
-        weightlist[i] = agents[i].w
+        weightlist[i] = agents[i].get_weights()
     with open(file,"wb") as f:
         pickle.dump(weightlist,f)
 
@@ -238,67 +236,64 @@ def createAgents(weights):
     global agents
     init()
     for ind in range(len(agents)):
+        newWeights = agents[ind].get_weights()
         if len(weights) > ind:
-            if isinstance(agents[ind].w, list):
-                for a1 in range(len(agents[ind].w)):
-                    if isinstance(agents[ind].w[a1], list):
-                        for a2 in range(len(agents[ind].w[a1])):
-                            if isinstance(agents[ind].w[a1][a2], list):
-                                for a3 in range(len(agents[ind].w[a1][a2])):
-                                    if isinstance(agents[ind].w[a1][a2][a3], list):
-                                        for a4 in range(len(agents[ind].w[a1][a2][a3])):
+            if isinstance(newWeights, list):
+                for a1 in range(len(newWeights)):
+                    if isinstance(newWeights[a1], list):
+                        for a2 in range(len(newWeights[a1])):
+                            if isinstance(newWeights[a1][a2], list):
+                                for a3 in range(len(newWeights[a1][a2])):
+                                    if isinstance(newWeights[a1][a2][a3], list):
+                                        for a4 in range(len(newWeights[a1][a2][a3])):
                                             try:
-                                                agents[ind].w[a1][a2][a3][a4] = weights[a1][a2][a3][a4]
+                                                newWeights[a1][a2][a3][a4] = weights[a1][a2][a3][a4]
                                             except Exception:
                                                 print("File does not fit weightlist!\n Initalizing nongiven values with random value in [-1, 1]")
-                                                agents[ind].w[a1][a2][a3][a4] = random.random()*2-1
+                                                newWeights[a1][a2][a3][a4] = random.random()*2-1
                                     else:
                                         try:
-                                            agents[ind].w[a1][a2][a3] = weights[a1][a2][a3]
+                                            newWeights[a1][a2][a3] = weights[a1][a2][a3]
                                         except Exception:
                                             print("File does not fit weightlist!\n Initalizing nongiven values with random value in [-1, 1]")
-                                            agents[ind].w[a1][a2][a3] = random.random()*2-1
+                                            newWeights[a1][a2][a3] = random.random()*2-1
                             else:
                                 try:
-                                    agents[ind].w[a1][a2] = weights[a1][a2]
+                                    newWeights[a1][a2] = weights[a1][a2]
                                 except Exception:
                                     print("File does not fit weightlist!\n Initalizing nongiven values with random value in [-1, 1]")
-                                    agents[ind].w[a1][a2] = random.random()*2-1
+                                    newWeights[a1][a2] = random.random()*2-1
                     else:
                         try:
-                            agents[ind].w[a1] = weights[a1]
+                            newWeights[a1] = weights[a1]
                         except Exception:
                             print("File does not fit weightlist!\n Initalizing nongiven values with random value in [-1, 1]")
-                            agents[ind].w[a1] = random.random()*2-1
+                            newWeights[a1] = random.random()*2-1
             else:
                 try:
-                    agents[ind].w = weights
+                    newWeights = weights
                 except Exception:
                     print("File does not fit weightlist!\n Initalizing nongiven values with random value in [-1, 1]")
-                    agents[ind].w = random.random()*2-1
+                    newWeights = random.random()*2-1
         else:
-            if isinstance(agents[ind].w, list):
-                for a1 in range(len(agents[ind].w)):
-                    if isinstance(agents[ind].w[a1], list):
-                        for a2 in range(len(agents[ind].w[a1])):
-                            if isinstance(agents[ind].w[a1][a2], list):
-                                for a3 in range(len(agents[ind].w[a1][a2])):
-                                    if isinstance(agents[ind].w[a1][a2][a3], list):
-                                        for a4 in range(len(agents[ind].w[a1][a2][a3])):
-                                            agents[ind].w[a1][a2][a3][a4] = random.random()*2-1
+            if isinstance(newWeights, list):
+                for a1 in range(len(newWeights)):
+                    if isinstance(newWeights[a1], list):
+                        for a2 in range(len(newWeights[a1])):
+                            if isinstance(newWeights[a1][a2], list):
+                                for a3 in range(len(newWeights[a1][a2])):
+                                    if isinstance(newWeights[a1][a2][a3], list):
+                                        for a4 in range(len(newWeights[a1][a2][a3])):
+                                            newWeights[a1][a2][a3][a4] = random.random()*2-1
                                     else:
-                                        agents[ind].w[a1][a2][a3] = random.random()*2-1
+                                        newWeights[a1][a2][a3] = random.random()*2-1
                             else:
-                                agents[ind].w[a1][a2] = random.random()*2-1
+                                newWeights[a1][a2] = random.random()*2-1
                     else:
-                        agents[ind].w[a1] = random.random()*2-1
+                        newWeights[a1] = random.random()*2-1
             else:
-                agents[ind].w = random.random()*2-1
-        if hasattr( agents[ind], "balance_weights" ):
-            try:
-                agents[ind].balance_weights()
-            except Exception:
-                print( "balance_weights is not a function or is not working properly" )
+                newWeights = random.random()*2-1
+        agents[ind].set_weights(newWeights)
     return
 
 # Creating agents to global variable

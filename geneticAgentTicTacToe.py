@@ -1,3 +1,4 @@
+# MAIN FILE
 import gc
 from tictactoe import tictactoe
 from geneticAgentFunctions import startAgent

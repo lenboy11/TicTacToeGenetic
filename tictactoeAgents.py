@@ -16,8 +16,7 @@ class NeuralAgent:
         self.no_inputs = 9
         self.no_layers = 3
         self.no_nodes = 9
-        self.w = [[[(0) for _ in range(self.no_nodes)] for _ in range(self.no_nodes)] for _ in range(self.no_layers)]
-        self.w.append( [[(0) for _ in range(self.no_nodes)] for _ in range(self.no_layers)] )
+        self.w = [[[[(0) for _ in range(self.no_nodes)] for _ in range(self.no_nodes)] for _ in range(self.no_layers)], [[(0) for _ in range(self.no_nodes)] for _ in range(self.no_layers)]]
         self.balance_weights()
         self.fitness = 0
     def __str__(self):
@@ -41,6 +40,25 @@ class NeuralAgent:
                 indizes[i] = values[len(self.w[1]) - 1][i]
         i = self.maxIndex(indizes)
         return i
+    def set_weights(self, weights):
+        try:
+            for i1 in range(len(self.w)):
+                for i2 in range(len(self.w)):
+                    if isinstance( self.w[i1][i2], list ):
+                        for i3 in range(len(self.w[i1][i2])):
+                            if isinstance( self.w[i1][i2][i3], list ):
+                                for i4 in range(len(self.w[i1][i2][i3])):
+                                    self.w[i1][i2][i3][i4] = float( weights[i1][i2][i3][i4] )
+                            else:
+                                self.w[i1][i2][i3] = float( weights[i1][i2][i3] )
+                    else:
+                        self.w[i1][i2] = float( weights[i1][i2] )
+        except Exception:
+            print("Weights could not be set")
+            pass
+        self.balance_weights()
+    def get_weights(self):
+        return self.w
     def balance_weights(self):
         # weights with specific logic
         for i in range(6):
@@ -103,10 +121,8 @@ class FastAgent:
         self.name = name
         self.w = [[0.3, 0.2], [0.3, 0.2]]
         self.fitness = 0
-
     def __str__(self):
         return self.name
-
     def guess(self, inputs):
         c = [0]*3
         r = [0]*3
@@ -144,16 +160,25 @@ class FastAgent:
                 break
             else:
                 res[curMax] = float('-inf')
+    def set_weights(self, weights):
+        try:
+            self.w[0][0] = float(weights[0][0])
+            self.w[0][1] = float(weights[0][1])
+            self.w[1][0] = float(weights[1][0])
+            self.w[1][1] = float(weights[1][1])
+        except Exception:
+            print("Weights could not be set")
+            pass
+    def get_weights(self):
+        return self.w
         
 class CountAgent:
     def __init__(self, name):
         self.name = name
         self.w = [0.1, [0.3, 0.25], -0.35]
         self.fitness = 0
-        
     def __str__(self):
         return self.name
-
     def guess(self, inputs):
         c = [0]*3
         r = [0]*3
@@ -161,13 +186,7 @@ class CountAgent:
         for i in range(3):
             x1 = max(0,inputs[i*3]) +  max(0,inputs[i*3 + 1]) +  max(0,inputs[i*3 + 2])
             x2 = max(0,-inputs[i*3]) +  max(0,-inputs[i*3 + 1]) +  max(0,-inputs[i*3 + 2])
-            try:
-                c[i] = self.w[0] + self.w[1][0]*x1 + self.w[1][1]*x2 + self.w[2]*x1*x2
-            except Exception as e:
-                print(type(self.w[0]))
-                print(type(self.w[1][0]))
-                print(type(self.w[1][1]))
-                print(type(self.w[2]))
+            c[i] = self.w[0] + self.w[1][0]*x1 + self.w[1][1]*x2 + self.w[2]*x1*x2
             x1 = max(0,inputs[i]) +  max(0,inputs[i + 3]) +  max(0,inputs[i + 6])
             x2 = max(0,-inputs[i]) +  max(0,-inputs[i + 3]) +  max(0,-inputs[i + 6])
             r[i] = self.w[0] + self.w[1][0]*x1 + self.w[1][1]*x2 + self.w[2]*x1*x2
@@ -195,6 +214,17 @@ class CountAgent:
                 break
             else:
                 res[curMax] = float('-inf')
+    def set_weights(self, weights):
+        try:
+            self.w[0] = float(weights[0])
+            self.w[1][0] = float(weights[1][0])
+            self.w[1][1] = float(weights[1][1])
+            self.w[2] = float(weights[2])
+        except Exception:
+            print("Weights could not be set")
+            pass
+    def get_weights(self):
+        return self.w
 
 # TASK: Add your own Agents here
 
@@ -246,7 +276,7 @@ class Player:
             except Exception:
                 pass
     # Make Board more suitable for user
-    def input2XO(input):
+    def input2XO(self, input):
         if input == -1:
             return "O"
         elif input == 1:
